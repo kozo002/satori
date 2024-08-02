@@ -42,10 +42,10 @@ export type { SatoriNode }
 
 export { init }
 
-export default async function satori(
+export async function compute(
   element: ReactNode,
   options: SatoriOptions
-): Promise<string> {
+): Promise<{ width: number; height: number; content: string }> {
   const Yoga = await getYoga()
   if (!Yoga || !Yoga.Node) {
     throw new Error(
@@ -190,7 +190,15 @@ export default async function satori(
 
   root.freeRecursive()
 
-  return svg({ width: computedWidth, height: computedHeight, content })
+  return { width: computedWidth, height: computedHeight, content }
+}
+
+export default async function satori(
+  element: ReactNode,
+  options: SatoriOptions
+): Promise<string> {
+  const { width, height, content } = await compute(element, options)
+  return svg({ width, height, content })
 }
 
 function convertToLanguageCodes(
